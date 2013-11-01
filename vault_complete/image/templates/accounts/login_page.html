@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+{% load split from custom_filters %}
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>Vault: My Secret Files</title>
+		<meta name="description" content="Vault: " />
+		<meta name="keywords" content="" />
+		<meta name="author" content="Codrops" />
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" type="text/css" href="/static/css/accountdefault.css" />
+		<link rel="stylesheet" type="text/css" href="/static/css/component.css" />
+		<script src="/static/js/modernizr.custom.js"></script>
+                <script src="/static/js/uploadimagescript.js"></script>
+	</head>
+	<body>
+        {% csrf_token %}
+		<div class="container">	
+			<header class="clearfix">
+				<span>Vault</span>
+				<h1>My Secret Files</h1>
+				<nav>
+                                        <a href="#openModal" class="icon-arrow-left" data-info="Encrypt">Encrypt</a>
+					<a href="#decryptModal" class="icon-drop" data-info="DeCrypt">Decrypt</a>
+					<a id="delimg" href="#" class="icon-drop" data-info="Delete">Delete</a>
+					<a href="#TagModal" class="icon-drop" data-info="Tag Me">TagMe</a>
+				</nav>
+			</header>
+			<div id="cbp-fwslider" class="cbp-fwslider">
+				<ul>
+                                {% for x in files %} 
+					<li><a href="#"><img id="foo" src="/media/{{ user.id }}/{{ x }}" alt="Image from Vault" title={{ x|split }}/></a></li>
+                                {% endfor %}
+				</ul>
+			</div>
+		</div>
+                <div id="openModal" class="modalDialog">
+                    <div>
+                        <a href="#close" title="Close" class="close">X</a>
+                          <p>Please enter your secret data here</p>
+                            <div>
+                                <form id="upload_form" enctype="multipart/form-data" method="post" action="/encrypt/">
+                                {% csrf_token %}
+                                <textarea id="enctext" name="etext" type="textarea" class="txtarea"value=""></textarea>
+                                <p> Or select an image file to encrypt </p>
+                                <div><input type="file" name="image_file" id="image_file" onchange="fileSelected();" /></div>
+                                <p> Passphrase Please:</p>
+                                <input id="encpass" name="epass" type="password" value="" />
+                                <p></p>
+                                <input id="encSubmit1" type="button" value="Submit" onclick="startUploading()" />
+                                <img id="preview" />
+                                <div id="fileinfo">
+                                    <div id="filename"></div>
+                                    <div id="filesize"></div>
+                                    <div id="filetype"></div>
+                                    <div id="filedim"></div>
+                                </div>
+                                <div id="error"></div>
+                                <div id="error2"></div>
+                                <div id="abort"></div>
+                                <div id="warnsize">The size is too much</div>
+                                <div id="progress_info">
+                                    <div id="progress"></div>
+                                    <div id="progress_percent">&nbsp;</div>
+                                    <div class="clear_both"></div>
+                                    <div>
+                                        <div id="speed">&nbsp;</div>
+                                        <div id="remaining">&nbsp;</div>
+                                        <div id="b_transfered">&nbsp;</div>
+                                        <div class="clear_both"></div>
+                                    </div>
+                                    <div id="upload_response"></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="decryptModal" class="modalDialog">
+                    <div>
+                        <a href="#close" title="Close" class="close">X</a>
+                          <p>Please enter your PassPhrase here to Decrytp</p>
+                            <div>
+                                <form id="decryptForm" method="post">
+                                {% csrf_token %}
+                                <input id="decpass" name="epass" type="password" value="" />
+                                <p></p>
+                                <input id="decSubmit" type="submit" value="submit"/>
+                                </form>
+                            </div>
+                    </div>
+                </div>
+                <div id="TagModal" class="modalDialog">
+                    <div>
+                        <a href="#close" title="Close" class="close">X</a>
+                          <p>Please Tag Me..</p>
+                            <div>
+                                <form id="tagForm" method="post">
+                                {% csrf_token %}
+                                <input id="tagvalue" name="tag" type="input" value="" />
+                                <p></p>
+                                <input id="tagSubmit" type="submit" value="submit"/>
+                                </form>
+                            </div>
+                    </div>
+                </div>
+                <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <script src="/static/js/jquery.cbpFWSlider.js"></script>
+		<script>
+			$( function() {
+				/*
+				- how to call the plugin:
+				$( selector ).cbpFWSlider( [options] );
+				- options:
+				{
+					// default transition speed (ms)
+					speed : 500,
+					// default transition easing
+					easing : 'ease'
+				}
+				- destroy:
+				$( selector ).cbpFWSlider( 'destroy' );
+				*/
+
+				$( '#cbp-fwslider' ).cbpFWSlider();
+
+			} );
+		</script>
+                <script>
+                    $('#encSubmit').click(function(e){
+                         e.preventDefault();
+                         $( '#cbp-fwslider').cbpFWSlider('currentimg');
+                         var pass = document.getElementById("encpass");
+                         if(!pass.value){
+                                alert("Please enter a vaild passphrase");
+                                return false;
+                         }
+                         $.post("/encrypt/", 
+                           $('#upload_form').serialize(), 
+                            function(data, status, xhr){
+                                alert(data);
+                          });
+                         var form = document.getElementById("myForm");
+                         form.reset();
+                    });
+		</script>
+                <script>
+                    $('#decSubmit').click(function(e){
+                         e.preventDefault();
+                         $( '#cbp-fwslider').cbpFWSlider('decryptimg');
+                         var pass = document.getElementById("decpass");
+                         if(!pass.value){
+                                alert("Please enter a vaild passphrase");
+                                return false;
+                         }
+                        var element = document.getElementById("dectext");
+                        if(element){
+                            element.parentNode.removeChild(element);
+                        };
+                         $.post("/decrypt/", 
+                           $('#decryptForm').serialize(), 
+                            function(data, status, xhr){
+                                var ndata = data.replace(/"/g,"");
+                                var found = ndata.search("dimg_");
+                                if(found != -1){
+                                    document.getElementById("decpass").style.display = 'none';
+                                    document.getElementById("decSubmit").style.display = 'none';
+                                    var container  = document.getElementById("decryptForm");
+                                    var input  = document.createElement("img");
+                                    input.id   = "decimg";
+                                    input.src  = ndata
+                                    container.appendChild(input);
+                                    $('#decimg').addClass('decimgc');
+                                    var inp     = document.createElement("input");
+                                    inp.id      = "delbut";
+                                    inp.type    = "submit"
+                                    inp.value   = "Delete"
+                                    container.appendChild(inp);
+                                    var hdn     = document.createElement("input");
+                                    hdn.id      = "delimg";
+                                    hdn.type    = "hidden"
+                                    hdn.name    = "delimage"
+                                    hdn.value   = ndata
+                                    container.appendChild(hdn);
+                                    return true
+                                }
+                                document.getElementById("decpass").style.display = 'none';
+                                document.getElementById("decSubmit").style.display = 'none';
+                                var container  = document.getElementById("decryptForm");
+                                var input  = document.createElement("textarea");
+                                input.type = "textarea";
+                                input.id   = "dectext";
+                                input.value = data;
+                                container.appendChild(input);
+                                var inp     = document.createElement("input");
+                                inp.id      = "delbut";
+                                inp.type    = "submit"
+                                inp.value   = "Done"
+                                container.appendChild(inp);
+                                $('#dectext').addClass('txtarea');
+                          });
+                    });
+		</script>
+                <script>
+                    $('#delimg').click(function(e){
+                        $( '#cbp-fwslider').cbpFWSlider('decryptimg');
+                         e.preventDefault();
+                         $.post("/deleteimg/",
+                           $('#decryptForm').serialize(),
+                            function(data, status, xhr){
+                                alert(data);
+                                location.reload();
+                                return true;
+                          });
+                    });
+		</script>
+                <script>
+                    $('#tagSubmit').click(function(e){
+                        $( '#cbp-fwslider').cbpFWSlider('tagimg');
+                         e.preventDefault();
+                         var tag = document.getElementById("tagvalue");
+                         if(!tag.value){
+                                alert("Please enter a tag");
+                                return false;
+                         }
+                         $.post("/tagimg/",
+                           $('#tagForm').serialize(),
+                            function(data, status, xhr){
+                                alert(data);
+                                return true;
+                          });
+                    });
+	     </script>
+	</body>
+</html>

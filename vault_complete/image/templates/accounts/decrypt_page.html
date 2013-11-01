@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>Vault: My Secret Files</title>
+		<meta name="description" content="Vault: " />
+		<meta name="keywords" content="" />
+		<meta name="author" content="Codrops" />
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" type="text/css" href="/static/css/accountdefault.css" />
+		<link rel="stylesheet" type="text/css" href="/static/css/component.css" />
+		<script src="/static/js/modernizr.custom.js"></script>
+	</head>
+	<body>
+        {% csrf_token %}
+		<div class="container">	
+			<header class="clearfix">
+				<span>Vault</span>
+				<h1>My Secret Files</h1>
+				<nav>
+                                        <a href="#delete" class="icon-arrow-left" data-info="delete">Delete</a>
+				</nav>
+			</header>
+			<div id="cbp-fwslider" class="cbp-fwslider">
+				<ul>
+                                {% for x in files %} 
+					<li><a href="#"><img id="foo" src="/media/{{ user.id }}/decrypt/{{ x }}" alt="Image from Vault"/></a></li>
+                                {% endfor %}
+				</ul>
+			</div>
+		</div>
+                <div id="delete">
+                </div
+                <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <script src="/static/js/jquery.cbpFWSlider.js"></script>
+		<script>
+			$( function() {
+				/*
+				- how to call the plugin:
+				$( selector ).cbpFWSlider( [options] );
+				- options:
+				{
+					// default transition speed (ms)
+					speed : 500,
+					// default transition easing
+					easing : 'ease'
+				}
+				- destroy:
+				$( selector ).cbpFWSlider( 'destroy' );
+				*/
+
+				$( '#cbp-fwslider' ).cbpFWSlider();
+
+			} );
+		</script>
+	</body>
+</html>
